@@ -48,7 +48,7 @@ gfx_defines!{
         vertex_buffer: gfx::VertexBuffer<ImDrawVert> = (),
         matrix: gfx::Global<[[f32; 4]; 4]> = "matrix",
         tex: gfx::TextureSampler<[f32; 4]> = "tex",
-        out: gfx::BlendTarget<gfx::format::Unorm> = (
+        out: gfx::BlendTarget<gfx::format::Rgba8> = (
             "Target0",
             gfx::state::ColorMask::all(),
             gfx::preset::blend::ALPHA,
@@ -104,7 +104,7 @@ impl<R: Resources> Renderer<R> {
         imgui: &mut ImGui,
         factory: &mut F,
         shaders: Shaders,
-        out: RenderTargetView<R, gfx::format::Unorm>,
+        out: RenderTargetView<R, gfx::format::Rgba8>,
     ) -> RendererResult<Renderer<R>> {
         let (vs_code, ps_code) = shaders.get_program_code();
         let pso = factory.create_pipeline_simple(vs_code, ps_code, pipe::new())?;
@@ -121,7 +121,7 @@ impl<R: Resources> Renderer<R> {
             Bind::empty(),
         )?;
         let (_, texture) = imgui.prepare_texture(|handle| {
-            factory.create_texture_immutable_u8::<gfx::format::Unorm>(
+            factory.create_texture_immutable_u8::<gfx::format::Rgba8>(
                 gfx::texture::Kind::D2(
                     handle.width as u16,
                     handle.height as u16,
@@ -163,7 +163,7 @@ impl<R: Resources> Renderer<R> {
             index_buffer: index_buffer,
         })
     }
-    pub fn update_render_target(&mut self, out: RenderTargetView<R, gfx::format::Unorm>) {
+    pub fn update_render_target(&mut self, out: RenderTargetView<R, gfx::format::Rgba8>) {
         self.bundle.data.out = out;
     }
     pub fn render<'a, F: Factory<R>, C: CommandBuffer<R>>(
