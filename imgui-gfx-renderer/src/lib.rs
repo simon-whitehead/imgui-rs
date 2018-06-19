@@ -48,7 +48,7 @@ gfx_defines!{
         vertex_buffer: gfx::VertexBuffer<ImDrawVert> = (),
         matrix: gfx::Global<[[f32; 4]; 4]> = "matrix",
         tex: gfx::TextureSampler<[f32; 4]> = "tex",
-        out: gfx::BlendTarget<gfx::format::Srgba8> = (
+        out: gfx::BlendTarget<gfx::format::Unorm> = (
             "Target0",
             gfx::state::ColorMask::all(),
             gfx::preset::blend::ALPHA,
@@ -121,7 +121,7 @@ impl<R: Resources> Renderer<R> {
             Bind::empty(),
         )?;
         let (_, texture) = imgui.prepare_texture(|handle| {
-            factory.create_texture_immutable_u8::<gfx::format::Srgba8>(
+            factory.create_texture_immutable_u8::<gfx::format::Unorm>(
                 gfx::texture::Kind::D2(
                     handle.width as u16,
                     handle.height as u16,
@@ -163,7 +163,7 @@ impl<R: Resources> Renderer<R> {
             index_buffer: index_buffer,
         })
     }
-    pub fn update_render_target(&mut self, out: RenderTargetView<R, gfx::format::Srgba8>) {
+    pub fn update_render_target(&mut self, out: RenderTargetView<R, gfx::format::Unorm>) {
         self.bundle.data.out = out;
     }
     pub fn render<'a, F: Factory<R>, C: CommandBuffer<R>>(
