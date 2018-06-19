@@ -20,19 +20,27 @@ pub enum RendererError {
 }
 
 impl From<gfx::UpdateError<usize>> for RendererError {
-    fn from(e: gfx::UpdateError<usize>) -> RendererError { RendererError::Update(e) }
+    fn from(e: gfx::UpdateError<usize>) -> RendererError {
+        RendererError::Update(e)
+    }
 }
 
 impl From<gfx::buffer::CreationError> for RendererError {
-    fn from(e: gfx::buffer::CreationError) -> RendererError { RendererError::Buffer(e) }
+    fn from(e: gfx::buffer::CreationError) -> RendererError {
+        RendererError::Buffer(e)
+    }
 }
 
 impl From<gfx::PipelineStateError<String>> for RendererError {
-    fn from(e: gfx::PipelineStateError<String>) -> RendererError { RendererError::Pipeline(e) }
+    fn from(e: gfx::PipelineStateError<String>) -> RendererError {
+        RendererError::Pipeline(e)
+    }
 }
 
 impl From<gfx::CombinedError> for RendererError {
-    fn from(e: gfx::CombinedError) -> RendererError { RendererError::Combined(e) }
+    fn from(e: gfx::CombinedError) -> RendererError {
+        RendererError::Combined(e)
+    }
 }
 
 gfx_defines!{
@@ -40,7 +48,7 @@ gfx_defines!{
         vertex_buffer: gfx::VertexBuffer<ImDrawVert> = (),
         matrix: gfx::Global<[[f32; 4]; 4]> = "matrix",
         tex: gfx::TextureSampler<[f32; 4]> = "tex",
-        out: gfx::BlendTarget<gfx::format::Rgba8> = (
+        out: gfx::BlendTarget<gfx::format::Srgba8> = (
             "Target0",
             gfx::state::ColorMask::all(),
             gfx::preset::blend::ALPHA,
@@ -51,9 +59,9 @@ gfx_defines!{
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum Shaders {
-    GlSl400, // OpenGL 4.0+
-    GlSl130, // OpenGL 3.0+
-    GlSl110, // OpenGL 2.0+
+    GlSl400,   // OpenGL 4.0+
+    GlSl130,   // OpenGL 3.0+
+    GlSl110,   // OpenGL 2.0+
     GlSlEs300, // OpenGL ES 3.0+
     GlSlEs100, // OpenGL ES 2.0+
 }
@@ -96,14 +104,10 @@ impl<R: Resources> Renderer<R> {
         imgui: &mut ImGui,
         factory: &mut F,
         shaders: Shaders,
-        out: RenderTargetView<R, gfx::format::Rgba8>,
+        out: RenderTargetView<R, gfx::format::Srgba8>,
     ) -> RendererResult<Renderer<R>> {
         let (vs_code, ps_code) = shaders.get_program_code();
-        let pso = factory.create_pipeline_simple(
-            vs_code,
-            ps_code,
-            pipe::new(),
-        )?;
+        let pso = factory.create_pipeline_simple(vs_code, ps_code, pipe::new())?;
         let vertex_buffer = factory.create_buffer::<ImDrawVert>(
             256,
             gfx::buffer::Role::Vertex,
@@ -117,7 +121,7 @@ impl<R: Resources> Renderer<R> {
             Bind::empty(),
         )?;
         let (_, texture) = imgui.prepare_texture(|handle| {
-            factory.create_texture_immutable_u8::<gfx::format::Rgba8>(
+            factory.create_texture_immutable_u8::<gfx::format::Srgba8>(
                 gfx::texture::Kind::D2(
                     handle.width as u16,
                     handle.height as u16,
@@ -159,7 +163,7 @@ impl<R: Resources> Renderer<R> {
             index_buffer: index_buffer,
         })
     }
-    pub fn update_render_target(&mut self, out: RenderTargetView<R, gfx::format::Rgba8>) {
+    pub fn update_render_target(&mut self, out: RenderTargetView<R, gfx::format::Srgba8>) {
         self.bundle.data.out = out;
     }
     pub fn render<'a, F: Factory<R>, C: CommandBuffer<R>>(
@@ -230,11 +234,7 @@ impl<R: Resources> Renderer<R> {
                 Bind::empty(),
             )?;
         }
-        Ok(encoder.update_buffer(
-            &self.bundle.data.vertex_buffer,
-            vtx_buffer,
-            0,
-        )?)
+        Ok(encoder.update_buffer(&self.bundle.data.vertex_buffer, vtx_buffer, 0)?)
     }
     fn upload_index_buffer<F: Factory<R>, C: CommandBuffer<R>>(
         &mut self,
