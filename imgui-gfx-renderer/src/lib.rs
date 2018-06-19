@@ -104,7 +104,7 @@ impl<R: Resources> Renderer<R> {
         imgui: &mut ImGui,
         factory: &mut F,
         shaders: Shaders,
-        out: RenderTargetView<R, gfx::format::Srgba8>,
+        out: RenderTargetView<R, gfx::format::Unorm>,
     ) -> RendererResult<Renderer<R>> {
         let (vs_code, ps_code) = shaders.get_program_code();
         let pso = factory.create_pipeline_simple(vs_code, ps_code, pipe::new())?;
